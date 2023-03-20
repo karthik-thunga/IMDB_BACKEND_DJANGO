@@ -16,11 +16,15 @@ git clone https://github.com/karthik-thunga/IMDB_BACKEND_DJANGO.git
 cd IMDB_BACKEND_DJANGO
 ```
 3. Create a virtual environment and activate it:
+
+For Linux: 
 ```
 python3 -m venv venv
-For Linux: 
 source venv/bin/activate
-For Windows: 
+```
+For Windows:
+```
+python -m venv venv
 venv\Script\activate
 ```
 4. Install the project dependencies:

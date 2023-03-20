@@ -18,8 +18,10 @@ cd IMDB_BACKEND_DJANGO
 3. Create a virtual environment and activate it:
 ```
 python3 -m venv venv
-For Linux: source venv/bin/activate
-For Windows: venv\Script\activate
+For Linux: 
+source venv/bin/activate
+For Windows: 
+venv\Script\activate
 ```
 4. Install the project dependencies:
 ```
@@ -80,12 +82,15 @@ The following API endpoints are available:
 * account/logout/ - Log out a user.
 * account/register/ - Register a new user.
 ## Authentication
-To access the protected API endpoints, users must first authenticate by sending a POST request to the /account/login/ endpoint with a valid username and password. This will return a token, which must be included in the Authorization header of subsequent requests to protected endpoints.
+To access the protected API endpoints, users must first authenticate by sending a POST request to the /account/login/ endpoint with a valid username and password. This will return a token, which must be included in the Authorization header of subsequent requests to protected endpoints. Some of the enpoints requires admin user privileges and create admin user with following command.
+```
+python manage.py createsuperuser
+``` 
 
 To log out, users can send a POST request to the /account/logout/ endpoint.
 
 To register a new user, users can send a POST request to the /account/register/ endpoint with a username and password.
 ## Acknowledgements
-This project was inspired by the Django REST framework tutorial.
+This project was inspired by the [Django REST framework](https://www.django-rest-framework.org/) tutorial.
 
 

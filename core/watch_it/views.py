@@ -2,12 +2,19 @@ from rest_framework.response import Response
 # from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from core.watch_it import models, serializers
-from rest_framework import status
+from rest_framework import status, filters
 from django.http import Http404
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from core.permission import AdminOrReadonly, ReviewUserOrReadOnly
 from rest_framework.serializers import ValidationError
+from django.db.models import Q
+
+
+class ContentPictureDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly, AdminOrReadonly]
+    serializer_class = serializers.ContentPictureSerializer
+    queryset = models.ContentPicture.objects.all()
 
 class ReviewView(ListAPIView):
     serializer_class = serializers.ReviewSerializer
@@ -108,6 +115,14 @@ class ContentViewAV(APIView):
     permission_classes = [AdminOrReadonly]
     def get(self, request):
         content_list = models.Content.objects.all()
+        search_param = request.query_params.get('search', None)
+        if search_param:
+            content_list = content_list.filter(
+                Q(title__icontains=search_param) | Q(description__icontains=search_param)
+                )
+        ordering = request.query_params.get('order', None)
+        if ordering:
+            content_list = content_list.order_by(*ordering.split(','))
         serializer = serializers.ContentSerializer(content_list, many=True)
         return Response(serializer.data)
     

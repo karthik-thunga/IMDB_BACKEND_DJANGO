@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.watch_it.models import Content, StreamPlatform, Review
+from core.watch_it.models import Content, StreamPlatform, Review, ContentPicture
 
 class ReviewSerializer(serializers.ModelSerializer):
     review_user = serializers.ReadOnlyField(source = 'review_user.username')
@@ -7,12 +7,18 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         exclude = ['content']
 
+class ContentPictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContentPicture
+        exclude = ['content']
+
 class ContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content
         exclude = ['total_rating']
     rating = serializers.SerializerMethodField()
-    reviews = ReviewSerializer(many=True, read_only=True)
+    platform_name = serializers.CharField(source='platform.name', read_only=True)
+    # reviews = ReviewSerializer(many=True, read_only=True)
 
     def get_rating(self, obj):
         total_rating = obj.total_rating

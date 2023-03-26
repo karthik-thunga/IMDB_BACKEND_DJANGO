@@ -86,7 +86,7 @@ The following API endpoints are available:
 * account/logout/ - Log out a user.
 * account/register/ - Register a new user.
 ## Authentication
-To access the protected API endpoints, users must first authenticate by sending a POST request to the /account/login/ endpoint with a valid username and password. This will return a token, which must be included in the Authorization header of subsequent requests to protected endpoints. Some of the enpoints requires admin user privileges and create admin user with following command.
+To access the protected API endpoints, users must first authenticate by sending a POST request to the /account/login/ endpoint with a valid username and password. This will return a token, which must be included in the Authorization header of subsequent requests to protected endpoints. Some of the endpoints requires admin user privileges and create admin user with following command.
 ```
 python manage.py createsuperuser
 ``` 

@@ -1,11 +1,22 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.user.models import User
-
+from datetime import timedelta
+import uuid
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+import os
+from PIL import Image
 CONTENT_TYPE_CHOICES = [('MOV', 'movie'),
                         ('TVS', 'tv show'),
                         ('DOC', 'documentary')
                         ]
+CONTENT_CERTIFICATES = [
+    ('U', 'unrestricted public exhibition (U)'),
+    ('U/A', 'parental guidance for children below age 12 (U/A)'),
+    ('A', 'adult (A)'),
+    ('S', 'viewing by specialised groups (S)')
+]
 
 class StreamPlatform(models.Model):
     name = models.CharField(max_length=50)
@@ -25,6 +36,9 @@ class Content(models.Model):
     lang = models.CharField(max_length=15, default='ENG')
     total_rating = models.IntegerField(default=0)
     count_rating = models.IntegerField(default=0)
+    certificate = models.CharField(choices=CONTENT_CERTIFICATES, default='U', max_length=5)
+    duration = models.DurationField(default=timedelta(minutes=1))
+    trailer_link = models.URLField(default='https://www.youtube.com/')
 
     def __str__(self):
         return f"{self.title}({self.release_year})"
@@ -41,4 +55,24 @@ class Review(models.Model):
 
     def __str__(self) -> str:
         return f"{self.rating} | {self.content.title}"
+
+def content_picture_upload_path(instance, filename):
+    return f"{instance.content.title}/{uuid.uuid4()}_{filename}"
+
+class ContentPicture(models.Model):
+    content = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='pictures')
+    picture = models.ImageField(upload_to=content_picture_upload_path)
+
+    def save(self, *args, **kwargs):
+        super().save()
+        img = Image.open(self.picture.path)
+        if img.width > 400 and img.height > 400:
+            output_size = (400, 400)
+            img.thumbnail(output_size)
+            img.save(self.picture.path)
+
+@receiver(pre_delete, sender=ContentPicture)
+def picture_file_delete(sender, instance, **kwargs):
+    if instance.picture:
+        os.remove(instance.picture.path)
 
